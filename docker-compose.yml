@@ -1,0 +1,39 @@
+version: '3.4'
+
+volumes:
+  pgdata:
+
+services:
+  api:
+    image: ${DOCKER_REGISTRY-}api
+    env_file: .env
+    depends_on:
+      - "postgres"
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+    ports:
+      - "${API_EXPOSED_PORT}:${API_PORT}"
+  postgres:
+    image: postgres
+    container_name: postgres-container
+    env_file: .env
+    environment:
+      POSTGRES_USER: "${POSTGRES_USERNAME}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    ports:
+      - "${POSTGRES_EXPOSED_PORT}:${POSTGRES_PORT}"
+    expose:
+      - "${POSTGRES_EXPOSED_PORT}"
+    command: "-p ${POSTGRES_EXPOSED_PORT}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+  redis:
+    image: redis
+    container_name: redis-container
+    env_file: .env
+    ports:
+      - "${REDIS_EXPOSED_PORT}:${REDIS_PORT}"
+    expose:
+      - "${REDIS_EXPOSED_PORT}"
