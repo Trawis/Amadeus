@@ -14,6 +14,7 @@
 
     public static class Amadeus
     {
+      public const int HOTEL_CACHE_STORE_DAYS = 1;
       public const int HOTEL_SEARCH_RADIUS = 100;
       public const int HOTEL_SEARCH_ADULTS = 1;
       public const bool HOTEL_SEARCH_INCLUDE_ALL = true;

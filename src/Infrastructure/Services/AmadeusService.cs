@@ -20,8 +20,8 @@ namespace Infrastructure.Services
     private readonly IAppLogger<AmadeusService> _logger;
 
     public AmadeusService(
-      ICachingService cachingService,
       IOptions<AmadeusSettings> amadeusSettings,
+      ICachingService cachingService,
       IAppLogger<AmadeusService> logger)
     {
       _amadeusSettings = amadeusSettings.Value;
@@ -48,7 +48,7 @@ namespace Infrastructure.Services
             client_secret = _amadeusSettings.AuthClientSecret
           })
           .ReceiveJson<AuthResponse>();
-        }, TimeSpan.FromSeconds(_amadeusSettings.AuthAccessTokenTTL), TimeSpan.FromSeconds(_amadeusSettings.AuthAccessTokenTTL));
+        }, TimeSpan.FromSeconds(_amadeusSettings.AuthAccessTokenTTL / 2), TimeSpan.FromSeconds(_amadeusSettings.AuthAccessTokenTTL));
 
         if (result.Access_Token.IsNullOrWhiteSpace())
         {
@@ -59,10 +59,11 @@ namespace Infrastructure.Services
         var expireDate = DateTime.UtcNow.AddSeconds(int.Parse(result.Expires_In));
         if (DateTime.UtcNow > expireDate)
         {
+          await _cachingService.InvalidateCacheAsync(cacheKey);
           await AuthenticateAsync();
         }
 
-        response.SetResult(result);
+        response.SetResult(result, ValidationMessages.Success);
       }
       catch (Exception ex)
       {

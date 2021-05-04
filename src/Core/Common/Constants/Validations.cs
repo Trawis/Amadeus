@@ -9,5 +9,6 @@
 
     // Hotel service
     public const string HotelsNotFoundError = "No hotels found by requested search parameters.";
+    public const string HotelsSearchError = "An error has occurred on hotel search.";
   }
 }

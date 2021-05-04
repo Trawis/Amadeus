@@ -9,9 +9,5 @@
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="AmadeusModule\Entities\" />
-    <Folder Include="AmadeusModule\Enums\" />
-  </ItemGroup>
 
 </Project>
