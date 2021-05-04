@@ -11,6 +11,7 @@ import "imrc-datetime-picker/dist/imrc-datetime-picker.css";
 export function Hotels() {
     const [momentValue, setMomentValue] = useState(moment());
     const [errors, setErrors] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [hotels, setHotels] = useState([]);
     const [cityCode, setCityCode] = useState('');
     const [checkInDate, setCheckInDate] = useState('');
@@ -21,6 +22,11 @@ export function Hotels() {
             return setErrors(["Search parameters cannot be empty."]);
         }
 
+        let hotels = [];
+
+        setErrors([]);
+        setIsLoading(true);
+        setHotels(hotels);
         try {
             const request = {
                 "cityCode": cityCode,
@@ -34,13 +40,16 @@ export function Hotels() {
                 return setErrors(["An error has occurred on searching hotels."]);
             }
             
-            setHotels(response.result);
+            hotels = response.result;
         } catch (e) {
             if (e.errors) {
                 setErrors(e.errors.map(error => error.message));
             } else {
                 setErrors([e.message]);
             }
+        } finally {
+            setIsLoading(false);
+            setHotels(hotels);
         }
     };
 
@@ -125,7 +134,7 @@ export function Hotels() {
                     </tr>
                 </thead>
                 <tbody>
-                    {!hotels && "Loading..."}
+                    {isLoading && "Loading..."}
                     {hotels && hotels.map((hotel) =>
                         <tr key={hotel.hotelId}>
                             <td>{hotel.name}</td>
